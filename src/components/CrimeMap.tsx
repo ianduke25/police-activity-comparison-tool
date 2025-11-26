@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Circle, Marker, useMapEvents, useMap } from "react-leaflet";
-import { HeatmapLayer } from "react-leaflet-heatmap-layer-v3";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import "leaflet.heat";
 import { CrimeData } from "@/lib/crimeAnalysis";
 
 // Fix for default markers
@@ -23,6 +23,44 @@ interface CrimeMapProps {
   comparisonRadius: number;
   onCenter1Change: (center: [number, number]) => void;
   onCenter2Change: (center: [number, number]) => void;
+}
+
+function HeatmapLayer({ data }: { data: CrimeData[] }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!data || data.length === 0) return;
+
+    const points: [number, number, number][] = data.map((point) => [
+      point.lat,
+      point.lon,
+      1, // intensity
+    ]);
+
+    // @ts-ignore - leaflet.heat types
+    const heatLayer = L.heatLayer(points, {
+      radius: 25,
+      blur: 15,
+      maxZoom: 17,
+      max: 1.0,
+      gradient: {
+        0.0: "#1a1a2e",
+        0.2: "#16213e",
+        0.4: "#0f3460",
+        0.6: "#533483",
+        0.8: "#e94560",
+        1.0: "#f4a261",
+      },
+    });
+
+    heatLayer.addTo(map);
+
+    return () => {
+      map.removeLayer(heatLayer);
+    };
+  }, [map, data]);
+
+  return null;
 }
 
 function MapClickHandler({ 
@@ -96,23 +134,7 @@ export function CrimeMap({
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
         />
         
-        <HeatmapLayer
-          points={data}
-          longitudeExtractor={(point: CrimeData) => point.lon}
-          latitudeExtractor={(point: CrimeData) => point.lat}
-          intensityExtractor={() => 1}
-          radius={20}
-          blur={15}
-          max={2}
-          gradient={{
-            0.0: "#1a1a2e",
-            0.2: "#16213e",
-            0.4: "#0f3460",
-            0.6: "#533483",
-            0.8: "#e94560",
-            1.0: "#f4a261",
-          }}
-        />
+        <HeatmapLayer data={data} />
 
         <MapClickHandler
           mode={mode}
