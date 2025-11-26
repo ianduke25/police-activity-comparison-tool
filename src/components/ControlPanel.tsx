@@ -1,9 +1,12 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { RotateCcw, Circle, Layers } from "lucide-react";
+import { AddressGeocoder } from "@/components/AddressGeocoder";
+import { toast } from "sonner";
 
 interface ControlPanelProps {
   mode: "concentric" | "comparison";
@@ -15,6 +18,7 @@ interface ControlPanelProps {
   onOuterRadiusChange: (value: number) => void;
   onComparisonRadiusChange: (value: number) => void;
   onReset: () => void;
+  onAddressGeocode: (lat: number, lon: number, forArea2?: boolean) => void;
 }
 
 export function ControlPanel({
@@ -27,7 +31,10 @@ export function ControlPanel({
   onOuterRadiusChange,
   onComparisonRadiusChange,
   onReset,
+  onAddressGeocode,
 }: ControlPanelProps) {
+  const [geocodeFor, setGeocodeFor] = useState<"area1" | "area2">("area1");
+
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
@@ -126,30 +133,70 @@ export function ControlPanel({
               className="w-full"
             />
           </div>
+
+          <div className="h-px bg-border" />
+
+          <AddressGeocoder
+            label="Place Center by Address"
+            onLocationFound={(lat, lon, address) => {
+              onAddressGeocode(lat, lon, false);
+              toast.success("Center placed at: " + address);
+            }}
+          />
         </>
       ) : (
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <Label>Circle Radius</Label>
-            <span className="text-sm font-mono text-muted-foreground">
-              {comparisonRadius}m
-            </span>
+        <>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label>Circle Radius</Label>
+              <span className="text-sm font-mono text-muted-foreground">
+                {comparisonRadius}m
+              </span>
+            </div>
+            <Slider
+              value={[comparisonRadius]}
+              onValueChange={([value]) => onComparisonRadiusChange(value)}
+              min={100}
+              max={3000}
+              step={50}
+              className="w-full"
+            />
           </div>
-          <Slider
-            value={[comparisonRadius]}
-            onValueChange={([value]) => onComparisonRadiusChange(value)}
-            min={100}
-            max={3000}
-            step={50}
-            className="w-full"
-          />
-        </div>
+
+          <div className="h-px bg-border" />
+
+          <div className="space-y-4">
+            <Label>Place Areas by Address</Label>
+            <RadioGroup
+              value={geocodeFor}
+              onValueChange={(value) => setGeocodeFor(value as "area1" | "area2")}
+              className="flex gap-4"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="area1" id="area1" />
+                <Label htmlFor="area1" className="text-sm cursor-pointer">Area 1</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="area2" id="area2" />
+                <Label htmlFor="area2" className="text-sm cursor-pointer">Area 2</Label>
+              </div>
+            </RadioGroup>
+
+            <AddressGeocoder
+              label={`Place ${geocodeFor === "area1" ? "Area 1" : "Area 2"}`}
+              onLocationFound={(lat, lon, address) => {
+                onAddressGeocode(lat, lon, geocodeFor === "area2");
+                toast.success(`${geocodeFor === "area1" ? "Area 1" : "Area 2"} placed at: ${address}`);
+              }}
+            />
+          </div>
+        </>
       )}
 
       <div className="p-4 bg-muted/50 rounded-lg text-sm text-muted-foreground">
         {mode === "concentric" 
-          ? "Click on the map to place the centroid. Drag the marker to reposition."
-          : "Click on the map to place Area 1, then click again for Area 2. Drag markers to reposition."}
+          ? "Click on the map or enter an address to place the centroid. Drag the marker to reposition."
+          : "Click on the map or use addresses to place Area 1, then Area 2. Drag markers to reposition."}
       </div>
     </motion.div>
   );

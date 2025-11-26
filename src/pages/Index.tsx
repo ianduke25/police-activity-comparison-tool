@@ -35,6 +35,9 @@ const Index = () => {
   }, [data]);
 
   const filteredData = useMemo(() => {
+    if (selectedOffenses.length === 0) {
+      return [];
+    }
     return data.filter((d) => selectedOffenses.includes(d.offenseType || "UNKNOWN"));
   }, [data, selectedOffenses]);
 
@@ -122,6 +125,13 @@ const Index = () => {
             onOuterRadiusChange={setOuterRadius}
             onComparisonRadiusChange={setComparisonRadius}
             onReset={handleReset}
+            onAddressGeocode={(lat, lon, forArea2) => {
+              if (forArea2) {
+                setCenter2([lat, lon]);
+              } else {
+                setCenter1([lat, lon]);
+              }
+            }}
           />
 
           <motion.div
