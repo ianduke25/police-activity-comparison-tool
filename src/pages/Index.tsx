@@ -128,7 +128,7 @@ const Index = () => {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
-            className="h-[calc(100vh-20rem)]"
+            className="w-full aspect-square"
           >
             <CrimeMap
               data={filteredData}

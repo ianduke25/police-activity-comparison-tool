@@ -45,6 +45,18 @@ export function CrimeMap({
   const marker1Ref = useRef<LeafletMarker | null>(null);
   const marker2Ref = useRef<LeafletMarker | null>(null);
 
+  // Use refs to track current mode and centers for click handler
+  const modeRef = useRef(mode);
+  const center1Ref = useRef(center1);
+  const center2Ref = useRef(center2);
+
+  // Update refs when props change
+  useEffect(() => {
+    modeRef.current = mode;
+    center1Ref.current = center1;
+    center2Ref.current = center2;
+  }, [mode, center1, center2]);
+
   // Initialize map once
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
@@ -65,20 +77,20 @@ export function CrimeMap({
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
     }).addTo(map);
 
-    // Click handler to place centroids
+    // Click handler to place centroids - uses refs to get latest values
     map.on("click", (e: L.LeafletMouseEvent) => {
       const { lat, lng } = e.latlng;
+      const currentMode = modeRef.current;
+      const currentCenter1 = center1Ref.current;
+      const currentCenter2 = center2Ref.current;
 
-      if (mode === "concentric") {
-        if (!center1) {
-          onCenter1Change([lat, lng]);
-        } else {
-          onCenter1Change([lat, lng]);
-        }
+      if (currentMode === "concentric") {
+        onCenter1Change([lat, lng]);
       } else {
-        if (!center1) {
+        // Comparison mode
+        if (!currentCenter1) {
           onCenter1Change([lat, lng]);
-        } else if (!center2) {
+        } else if (!currentCenter2) {
           onCenter2Change([lat, lng]);
         }
       }
