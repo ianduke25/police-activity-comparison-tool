@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Circle, Marker, useMapEvents, useMap } from "react-leaflet";
-import HeatmapLayerFactory from "react-leaflet-heatmap-layer-v3";
+import { HeatmapLayer } from "react-leaflet-heatmap-layer-v3";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { CrimeData } from "@/lib/crimeAnalysis";
@@ -12,8 +12,6 @@ L.Icon.Default.mergeOptions({
   iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
   shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
-
-const HeatmapLayer = HeatmapLayerFactory<[number, number, number]>();
 
 interface CrimeMapProps {
   data: CrimeData[];
@@ -85,12 +83,6 @@ export function CrimeMap({
     }
   }, [center1]);
 
-  const heatmapPoints = data.map((point) => [
-    point.lat,
-    point.lon,
-    1, // intensity
-  ] as [number, number, number]);
-
   return (
     <div className="relative w-full h-full rounded-xl overflow-hidden border border-border shadow-lg">
       <MapContainer
@@ -105,10 +97,10 @@ export function CrimeMap({
         />
         
         <HeatmapLayer
-          points={heatmapPoints}
-          longitudeExtractor={(point: [number, number, number]) => point[1]}
-          latitudeExtractor={(point: [number, number, number]) => point[0]}
-          intensityExtractor={(point: [number, number, number]) => point[2]}
+          points={data}
+          longitudeExtractor={(point: CrimeData) => point.lon}
+          latitudeExtractor={(point: CrimeData) => point.lat}
+          intensityExtractor={() => 1}
           radius={20}
           blur={15}
           max={2}
