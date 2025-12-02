@@ -118,11 +118,8 @@ const Index = () => {
           </div>
           <div>
             <h1 className="text-3xl md:text-4xl font-display font-bold text-gradient">
-              Crime Hotspot Explorer
+              Richmond Police Activity Comparison Interface
             </h1>
-            <p className="text-muted-foreground mt-1">
-              Statistical analysis of spatial crime concentrations
-            </p>
           </div>
         </div>
       </motion.header>
