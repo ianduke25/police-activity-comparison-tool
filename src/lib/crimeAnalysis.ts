@@ -2,6 +2,7 @@ export interface CrimeData {
   lat: number;
   lon: number;
   offenseType?: string;
+  offenseDate?: Date;
   [key: string]: any;
 }
 

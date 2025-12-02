@@ -4,6 +4,7 @@ import { CrimeMap } from "@/components/CrimeMap";
 import { OffenseFilter } from "@/components/OffenseFilter";
 import { AnalysisPanel } from "@/components/AnalysisPanel";
 import { ControlPanel } from "@/components/ControlPanel";
+import { DateRangeFilter } from "@/components/DateRangeFilter";
 import { CrimeData, analyzeConcentricCircles, compareTwoAreas } from "@/lib/crimeAnalysis";
 import { motion } from "framer-motion";
 import { BarChart3 } from "lucide-react";
@@ -20,6 +21,20 @@ const Index = () => {
   const [innerRadius, setInnerRadius] = useState(500);
   const [outerRadius, setOuterRadius] = useState(1500);
   const [comparisonRadius, setComparisonRadius] = useState(800);
+  
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+
+  // Calculate min/max dates from data
+  const { minDate, maxDate } = useMemo(() => {
+    if (data.length === 0) return { minDate: null, maxDate: null };
+    const dates = data.map(d => d.offenseDate).filter((d): d is Date => d !== undefined);
+    if (dates.length === 0) return { minDate: null, maxDate: null };
+    return {
+      minDate: new Date(Math.min(...dates.map(d => d.getTime()))),
+      maxDate: new Date(Math.max(...dates.map(d => d.getTime()))),
+    };
+  }, [data]);
 
   useEffect(() => {
     if (data.length > 0) {
@@ -34,12 +49,26 @@ const Index = () => {
     }
   }, [data]);
 
+  // Set default date range when data loads
+  useEffect(() => {
+    if (minDate && maxDate) {
+      setStartDate(minDate);
+      setEndDate(maxDate);
+    }
+  }, [minDate, maxDate]);
+
   const filteredData = useMemo(() => {
     if (selectedOffenses.length === 0) {
       return [];
     }
-    return data.filter((d) => selectedOffenses.includes(d.offenseType || "UNKNOWN"));
-  }, [data, selectedOffenses]);
+    return data.filter((d) => {
+      const matchesOffense = selectedOffenses.includes(d.offenseType || "UNKNOWN");
+      const matchesDate = d.offenseDate && 
+        (!startDate || d.offenseDate >= startDate) &&
+        (!endDate || d.offenseDate <= endDate);
+      return matchesOffense && matchesDate;
+    });
+  }, [data, selectedOffenses, startDate, endDate]);
 
   const concentricResult = useMemo(() => {
     if (mode !== "concentric" || !center1) return null;
@@ -100,7 +129,15 @@ const Index = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left sidebar - Filters */}
-        <div className="lg:col-span-3">
+        <div className="lg:col-span-3 space-y-4">
+          <DateRangeFilter
+            minDate={minDate}
+            maxDate={maxDate}
+            startDate={startDate}
+            endDate={endDate}
+            onStartDateChange={setStartDate}
+            onEndDateChange={setEndDate}
+          />
           <OffenseFilter
             offenseTypes={offenseTypes}
             selectedOffenses={selectedOffenses}

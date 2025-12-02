@@ -43,10 +43,23 @@ export function FileUpload({ onDataLoaded }: FileUploadProps) {
               }
               
               if (lat && lon && !isNaN(lat) && !isNaN(lon)) {
+                // Parse offensedateutc if present
+                let offenseDate: Date | undefined;
+                if (row.offensedateutc) {
+                  const parsed_date = new Date(row.offensedateutc);
+                  if (!isNaN(parsed_date.getTime())) {
+                    offenseDate = parsed_date;
+                  }
+                }
+                
+                // Skip rows without valid dates
+                if (!offenseDate) return;
+                
                 parsed.push({
                   lat: Number(lat),
                   lon: Number(lon),
                   offenseType: row.offense_grouping || row.offensecode || row.offense_type || "UNKNOWN",
+                  offenseDate,
                   ...row,
                 });
               }
