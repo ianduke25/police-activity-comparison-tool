@@ -109,9 +109,9 @@ export function AnalysisPanel({
               <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
                 <p className="text-sm leading-relaxed">
                   {concentricResult.rateRatio > 1.1 ? (
-                    <>The inner circle has a <strong>{concentricResult.rateRatio.toFixed(2)}x as high as</strong> police activity rate than the surrounding area.</>
+                    <>The inner circle has a <strong>{concentricResult.rateRatio.toFixed(2)}x as high as</strong> police activity rate of the surrounding area.</>
                   ) : concentricResult.rateRatio < 0.9 ? (
-                    <>The inner circle has a <strong>{concentricResult.rateRatio.toFixed(2)}x as high as</strong> police activity rate than the surrounding area.</>
+                    <>The inner circle has a <strong>{concentricResult.rateRatio.toFixed(2)}x as high as</strong> police activity rate of the surrounding area.</>
                   ) : (
                     <>Rates of police activity are similar between the inner circle and surrounding area.</>
                   )}
@@ -187,9 +187,9 @@ export function AnalysisPanel({
               <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
                 <p className="text-sm leading-relaxed">
                   {comparisonResult.rateRatio > 1.1 ? (
-                    <>Area 1 has a <strong>{comparisonResult.rateRatio.toFixed(2)}x higher</strong> crime rate than Area 2.</>
+                    <>Area 1 has a <strong>{comparisonResult.rateRatio.toFixed(2)}x higher</strong> police activity rate than Area 2.</>
                   ) : comparisonResult.rateRatio < 0.9 ? (
-                    <>Area 1 has a <strong>{comparisonResult.rateRatio.toFixed(2)}x lower</strong> crime rate than Area 2.</>
+                    <>Area 1 has a <strong>{comparisonResult.rateRatio.toFixed(2)}x lower</strong> police activity rate than Area 2.</>
                   ) : (
                     <>Crime rates are similar between the two areas.</>
                   )}
