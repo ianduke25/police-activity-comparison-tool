@@ -109,7 +109,7 @@ export function AnalysisPanel({
               <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
                 <p className="text-sm leading-relaxed">
                   {concentricResult.rateRatio > 1.1 ? (
-                    <>The inner circle has police activity rate <strong>{concentricResult.rateRatio.toFixed(2)}x as high as</strong> the surrounding area.</>
+                    <>The inner circle has a police activity rate <strong>{concentricResult.rateRatio.toFixed(2)}x as high as</strong> the surrounding area.</>
                   ) : concentricResult.rateRatio < 0.9 ? (
                     <>The inner circle has a police activity rate <strong>{concentricResult.rateRatio.toFixed(2)}x as high as</strong> the surrounding area.</>
                   ) : (
