@@ -125,7 +125,7 @@ export function FileUpload({ onDataLoaded }: FileUploadProps) {
             
             <div className="space-y-2">
               <h2 className="text-3xl font-display font-bold text-gradient">
-                Upload Crime Data
+                Upload Data
               </h2>
               <p className="text-muted-foreground text-lg">
                 Drop your CSV file here or click to browse
