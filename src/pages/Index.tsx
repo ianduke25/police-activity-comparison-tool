@@ -118,7 +118,7 @@ const Index = () => {
           </div>
           <div>
             <h1 className="text-3xl md:text-4xl font-display font-bold text-gradient">
-              Richmond Police Activity Comparison Interface
+              Police Activity Comparison Interface
             </h1>
           </div>
         </div>
