@@ -5,8 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { RotateCcw, Circle, Layers } from "lucide-react";
-import { AddressGeocoder } from "@/components/AddressGeocoder";
-import { toast } from "sonner";
+import { CoordinateInput } from "@/components/CoordinateInput";
 
 interface ControlPanelProps {
   mode: "concentric" | "comparison";
@@ -18,7 +17,7 @@ interface ControlPanelProps {
   onOuterRadiusChange: (value: number) => void;
   onComparisonRadiusChange: (value: number) => void;
   onReset: () => void;
-  onAddressGeocode: (lat: number, lon: number, forArea2?: boolean) => void;
+  onCoordinateSet: (lat: number, lon: number, forArea2?: boolean) => void;
 }
 
 export function ControlPanel({
@@ -31,9 +30,9 @@ export function ControlPanel({
   onOuterRadiusChange,
   onComparisonRadiusChange,
   onReset,
-  onAddressGeocode,
+  onCoordinateSet,
 }: ControlPanelProps) {
-  const [geocodeFor, setGeocodeFor] = useState<"area1" | "area2">("area1");
+  const [coordFor, setCoordFor] = useState<"area1" | "area2">("area1");
 
   return (
     <motion.div
@@ -136,12 +135,9 @@ export function ControlPanel({
 
           <div className="h-px bg-border" />
 
-          <AddressGeocoder
-            label="Place Center by Address"
-            onLocationFound={(lat, lon, address) => {
-              onAddressGeocode(lat, lon, false);
-              toast.success("Center placed at: " + address);
-            }}
+          <CoordinateInput
+            label="Place Center by Coordinates"
+            onLocationSet={(lat, lon) => onCoordinateSet(lat, lon, false)}
           />
         </>
       ) : (
@@ -166,10 +162,10 @@ export function ControlPanel({
           <div className="h-px bg-border" />
 
           <div className="space-y-4">
-            <Label>Place Areas by Address</Label>
+            <Label>Place Areas by Coordinates</Label>
             <RadioGroup
-              value={geocodeFor}
-              onValueChange={(value) => setGeocodeFor(value as "area1" | "area2")}
+              value={coordFor}
+              onValueChange={(value) => setCoordFor(value as "area1" | "area2")}
               className="flex gap-4"
             >
               <div className="flex items-center space-x-2">
@@ -182,12 +178,9 @@ export function ControlPanel({
               </div>
             </RadioGroup>
 
-            <AddressGeocoder
-              label={`Place ${geocodeFor === "area1" ? "Area 1" : "Area 2"}`}
-              onLocationFound={(lat, lon, address) => {
-                onAddressGeocode(lat, lon, geocodeFor === "area2");
-                toast.success(`${geocodeFor === "area1" ? "Area 1" : "Area 2"} placed at: ${address}`);
-              }}
+            <CoordinateInput
+              label={`Place ${coordFor === "area1" ? "Area 1" : "Area 2"}`}
+              onLocationSet={(lat, lon) => onCoordinateSet(lat, lon, coordFor === "area2")}
             />
           </div>
         </>
@@ -195,8 +188,8 @@ export function ControlPanel({
 
       <div className="p-4 bg-muted/50 rounded-lg text-sm text-muted-foreground">
         {mode === "concentric" 
-          ? "Click on the map or enter an address to place the centroid. Drag the marker to reposition."
-          : "Click on the map or use addresses to place Area 1, then Area 2. Drag markers to reposition."}
+          ? "Click on the map or enter coordinates to place the centroid. Drag the marker to reposition."
+          : "Click on the map or use coordinates to place Area 1, then Area 2. Drag markers to reposition."}
       </div>
     </motion.div>
   );

@@ -23,13 +23,6 @@ export function AnalysisPanel({
   outerRadius,
   comparisonRadius,
 }: AnalysisPanelProps) {
-  const getSignificance = (pValue: number) => {
-    if (pValue < 0.001) return "***";
-    if (pValue < 0.01) return "**";
-    if (pValue < 0.05) return "*";
-    return "ns";
-  };
-
   const getRatioIcon = (ratio: number) => {
     if (ratio > 1.1) return <TrendingUp className="w-5 h-5 text-data-viz-3" />;
     if (ratio < 0.9) return <TrendingDown className="w-5 h-5 text-data-viz-2" />;
@@ -50,7 +43,7 @@ export function AnalysisPanel({
     >
       <div>
         <h3 className="text-xl font-display font-bold mb-2">
-          Statistical Analysis
+          Descriptive Statistics
         </h3>
         <p className="text-sm text-muted-foreground">
           {mode === "concentric" 
@@ -103,30 +96,13 @@ export function AnalysisPanel({
 
               <div className="h-px bg-border" />
 
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Rate Ratio</span>
-                  <div className="flex items-center gap-2">
-                    {getRatioIcon(concentricResult.rateRatio)}
-                    <span className={`text-2xl font-bold ${getRatioColor(concentricResult.rateRatio)}`}>
-                      {concentricResult.rateRatio.toFixed(3)}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">95% CI</span>
-                    <span className="font-mono">
-                      [{concentricResult.ciLow.toFixed(3)}, {concentricResult.ciHigh.toFixed(3)}]
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">p-value</span>
-                    <span className="font-mono">
-                      {concentricResult.pValue.toFixed(4)} {getSignificance(concentricResult.pValue)}
-                    </span>
-                  </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Rate Ratio</span>
+                <div className="flex items-center gap-2">
+                  {getRatioIcon(concentricResult.rateRatio)}
+                  <span className={`text-2xl font-bold ${getRatioColor(concentricResult.rateRatio)}`}>
+                    {concentricResult.rateRatio.toFixed(3)}
+                  </span>
                 </div>
               </div>
 
@@ -138,9 +114,6 @@ export function AnalysisPanel({
                     <>The inner circle has a <strong>{concentricResult.rateRatio.toFixed(2)}x lower</strong> crime rate than the surrounding area.</>
                   ) : (
                     <>Crime rates are similar between the inner circle and surrounding area.</>
-                  )}
-                  {concentricResult.pValue < 0.05 && (
-                    <> This difference is <strong>statistically significant</strong>.</>
                   )}
                 </p>
               </div>
@@ -201,30 +174,13 @@ export function AnalysisPanel({
 
               <div className="h-px bg-border" />
 
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Rate Ratio (A1/A2)</span>
-                  <div className="flex items-center gap-2">
-                    {getRatioIcon(comparisonResult.rateRatio)}
-                    <span className={`text-2xl font-bold ${getRatioColor(comparisonResult.rateRatio)}`}>
-                      {comparisonResult.rateRatio.toFixed(3)}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">95% CI</span>
-                    <span className="font-mono">
-                      [{comparisonResult.ciLow.toFixed(3)}, {comparisonResult.ciHigh.toFixed(3)}]
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">p-value</span>
-                    <span className="font-mono">
-                      {comparisonResult.pValue.toFixed(4)} {getSignificance(comparisonResult.pValue)}
-                    </span>
-                  </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Rate Ratio (A1/A2)</span>
+                <div className="flex items-center gap-2">
+                  {getRatioIcon(comparisonResult.rateRatio)}
+                  <span className={`text-2xl font-bold ${getRatioColor(comparisonResult.rateRatio)}`}>
+                    {comparisonResult.rateRatio.toFixed(3)}
+                  </span>
                 </div>
               </div>
 
@@ -236,9 +192,6 @@ export function AnalysisPanel({
                     <>Area 1 has a <strong>{comparisonResult.rateRatio.toFixed(2)}x lower</strong> crime rate than Area 2.</>
                   ) : (
                     <>Crime rates are similar between the two areas.</>
-                  )}
-                  {comparisonResult.pValue < 0.05 && (
-                    <> This difference is <strong>statistically significant</strong>.</>
                   )}
                 </p>
               </div>

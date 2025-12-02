@@ -106,19 +106,9 @@ export function FileUpload({ onDataLoaded }: FileUploadProps) {
       >
         <label htmlFor="file-upload" className="cursor-pointer">
           <div className="flex flex-col items-center gap-6">
-            <motion.div
-              animate={{ 
-                y: [0, -10, 0],
-              }}
-              transition={{ 
-                duration: 2, 
-                repeat: Infinity,
-                ease: "easeInOut" 
-              }}
-              className="p-6 rounded-full bg-primary/10 glow"
-            >
+            <div className="p-6 rounded-full bg-primary/10">
               <Upload className="w-16 h-16 text-primary" />
-            </motion.div>
+            </div>
             
             <div className="space-y-2">
               <h2 className="text-3xl font-display font-bold text-gradient">
