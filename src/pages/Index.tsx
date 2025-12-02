@@ -125,7 +125,7 @@ const Index = () => {
             onOuterRadiusChange={setOuterRadius}
             onComparisonRadiusChange={setComparisonRadius}
             onReset={handleReset}
-            onAddressGeocode={(lat, lon, forArea2) => {
+            onCoordinateSet={(lat, lon, forArea2) => {
               if (forArea2) {
                 setCenter2([lat, lon]);
               } else {
