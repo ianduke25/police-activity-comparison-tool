@@ -52,9 +52,7 @@ export function FileUpload({ onDataLoaded }: FileUploadProps) {
                   }
                 }
                 
-                // Skip rows without valid dates
-                if (!offenseDate) return;
-                
+                // Include ALL records, even without dates
                 parsed.push({
                   lat: Number(lat),
                   lon: Number(lon),

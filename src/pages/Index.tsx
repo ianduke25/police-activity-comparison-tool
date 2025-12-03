@@ -49,13 +49,7 @@ const Index = () => {
     }
   }, [data]);
 
-  // Set default date range when data loads
-  useEffect(() => {
-    if (minDate && maxDate) {
-      setStartDate(minDate);
-      setEndDate(maxDate);
-    }
-  }, [minDate, maxDate]);
+  // Don't auto-set date range - let user explicitly filter if they want
 
   const filteredData = useMemo(() => {
     if (selectedOffenses.length === 0) {
@@ -63,7 +57,20 @@ const Index = () => {
     }
     return data.filter((d) => {
       const matchesOffense = selectedOffenses.includes(d.offenseType || "UNKNOWN");
-      const matchesDate = d.offenseDate && 
+      
+      // Only filter by date if user has explicitly set a date range
+      // If no date range set, include ALL records (even those without dates)
+      const hasDateFilter = startDate || endDate;
+      if (!hasDateFilter) {
+        return matchesOffense;
+      }
+      
+      // If date filter is set but record has no date, exclude it
+      if (!d.offenseDate) {
+        return false;
+      }
+      
+      const matchesDate = 
         (!startDate || d.offenseDate >= startDate) &&
         (!endDate || d.offenseDate <= endDate);
       return matchesOffense && matchesDate;
