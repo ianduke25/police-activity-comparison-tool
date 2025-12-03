@@ -124,9 +124,35 @@ const Index = () => {
         </h1>
       </motion.header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      {/* Control Panel - Full width at top */}
+      <ControlPanel
+        mode={mode}
+        onModeChange={(newMode) => {
+          setMode(newMode);
+          if (newMode === "concentric") {
+            setCenter2(null);
+          }
+        }}
+        innerRadius={innerRadius}
+        outerRadius={outerRadius}
+        comparisonRadius={comparisonRadius}
+        onInnerRadiusChange={setInnerRadius}
+        onOuterRadiusChange={setOuterRadius}
+        onComparisonRadiusChange={setComparisonRadius}
+        onReset={handleReset}
+        onCoordinateSet={(lat, lon, forArea2) => {
+          if (forArea2) {
+            setCenter2([lat, lon]);
+          } else {
+            setCenter1([lat, lon]);
+          }
+        }}
+      />
+
+      {/* Main content row - Filters, Map, Analysis all at same level */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mt-4">
         {/* Left sidebar - Filters */}
-        <div className="lg:col-span-3 space-y-4 lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto">
+        <div className="lg:col-span-3 space-y-4">
           <DateRangeFilter
             minDate={minDate}
             maxDate={maxDate}
@@ -142,32 +168,8 @@ const Index = () => {
           />
         </div>
 
-        {/* Main content */}
-        <div className="lg:col-span-6 space-y-4">
-          <ControlPanel
-            mode={mode}
-            onModeChange={(newMode) => {
-              setMode(newMode);
-              if (newMode === "concentric") {
-                setCenter2(null);
-              }
-            }}
-            innerRadius={innerRadius}
-            outerRadius={outerRadius}
-            comparisonRadius={comparisonRadius}
-            onInnerRadiusChange={setInnerRadius}
-            onOuterRadiusChange={setOuterRadius}
-            onComparisonRadiusChange={setComparisonRadius}
-            onReset={handleReset}
-            onCoordinateSet={(lat, lon, forArea2) => {
-              if (forArea2) {
-                setCenter2([lat, lon]);
-              } else {
-                setCenter1([lat, lon]);
-              }
-            }}
-          />
-
+        {/* Map */}
+        <div className="lg:col-span-6">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -189,7 +191,7 @@ const Index = () => {
         </div>
 
         {/* Right sidebar - Analysis */}
-        <div className="lg:col-span-3 lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto">
+        <div className="lg:col-span-3">
           <AnalysisPanel
             mode={mode}
             concentricResult={concentricResult}
