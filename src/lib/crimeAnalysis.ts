@@ -32,25 +32,26 @@ export interface ComparisonResult {
   area2Area: number;
 }
 
-// Haversine distance in kilometers
-export function haversineDistance(
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number
+// Haversine distance in meters (matches Python implementation exactly)
+export function haversineDistanceMeters(
+  centerLat: number,
+  centerLon: number,
+  pointLat: number,
+  pointLon: number
 ): number {
-  const R = 6371; // Earth's radius in km
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
-  
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) *
-      Math.cos(toRad(lat2)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-  
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const R = 6371000; // Earth radius in meters
+
+  const lat1 = toRad(centerLat);
+  const lon1 = toRad(centerLon);
+  const lat2 = toRad(pointLat);
+  const lon2 = toRad(pointLon);
+
+  const dlat = lat2 - lat1;
+  const dlon = lon2 - lon1;
+
+  const a = Math.sin(dlat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dlon / 2) ** 2;
+  const c = 2 * Math.asin(Math.sqrt(a));
+
   return R * c;
 }
 
@@ -122,14 +123,17 @@ export function calculateRateRatio(
   };
 }
 
-// Analyze concentric circles
+// Analyze concentric circles (radii in meters)
 export function analyzeConcentricCircles(
   data: CrimeData[],
   centerLat: number,
   centerLon: number,
-  innerRadiusKm: number,
-  outerRadiusKm: number
+  innerRadiusM: number,
+  outerRadiusM: number
 ): AnalysisResult | null {
+  // Convert to km for area calculation
+  const innerRadiusKm = innerRadiusM / 1000;
+  const outerRadiusKm = outerRadiusM / 1000;
   const innerArea = Math.PI * innerRadiusKm * innerRadiusKm;
   const outerArea = Math.PI * (outerRadiusKm * outerRadiusKm - innerRadiusKm * innerRadiusKm);
 
@@ -137,10 +141,10 @@ export function analyzeConcentricCircles(
   let outsideCount = 0;
 
   data.forEach((point) => {
-    const distance = haversineDistance(centerLat, centerLon, point.lat, point.lon);
-    if (distance <= innerRadiusKm) {
+    const distance = haversineDistanceMeters(centerLat, centerLon, point.lat, point.lon);
+    if (distance <= innerRadiusM) {
       insideCount++;
-    } else if (distance <= outerRadiusKm) {
+    } else if (distance <= outerRadiusM) {
       outsideCount++;
     }
   });
@@ -163,28 +167,30 @@ export function analyzeConcentricCircles(
   };
 }
 
-// Analyze two separate circles
+// Analyze two separate circles (radius in meters)
 export function compareTwoAreas(
   data: CrimeData[],
   center1Lat: number,
   center1Lon: number,
   center2Lat: number,
   center2Lon: number,
-  radiusKm: number
+  radiusM: number
 ): ComparisonResult | null {
+  // Convert to km for area calculation
+  const radiusKm = radiusM / 1000;
   const area = Math.PI * radiusKm * radiusKm;
 
   let area1Count = 0;
   let area2Count = 0;
 
   data.forEach((point) => {
-    const distance1 = haversineDistance(center1Lat, center1Lon, point.lat, point.lon);
-    const distance2 = haversineDistance(center2Lat, center2Lon, point.lat, point.lon);
+    const distance1 = haversineDistanceMeters(center1Lat, center1Lon, point.lat, point.lon);
+    const distance2 = haversineDistanceMeters(center2Lat, center2Lon, point.lat, point.lon);
     
-    if (distance1 <= radiusKm) {
+    if (distance1 <= radiusM) {
       area1Count++;
     }
-    if (distance2 <= radiusKm) {
+    if (distance2 <= radiusM) {
       area2Count++;
     }
   });
