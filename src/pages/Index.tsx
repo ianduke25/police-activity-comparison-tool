@@ -7,7 +7,7 @@ import { ControlPanel } from "@/components/ControlPanel";
 import { DateRangeFilter } from "@/components/DateRangeFilter";
 import { CrimeData, analyzeConcentricCircles, compareTwoAreas } from "@/lib/crimeAnalysis";
 import { motion } from "framer-motion";
-import { BarChart3 } from "lucide-react";
+
 
 const Index = () => {
   const [data, setData] = useState<CrimeData[]>([]);
@@ -117,23 +117,16 @@ const Index = () => {
       <motion.header
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mb-6"
+        className="mb-4"
       >
-        <div className="flex items-center gap-3">
-          <div className="p-3 rounded-xl bg-primary/10 glow">
-            <BarChart3 className="w-8 h-8 text-primary" />
-          </div>
-          <div>
-            <h1 className="text-3xl md:text-4xl font-display font-bold text-gradient">
-              Police Activity Comparison Interface
-            </h1>
-          </div>
-        </div>
+        <h1 className="text-2xl md:text-3xl font-display font-bold text-gradient">
+          Police Activity Comparison Interface
+        </h1>
       </motion.header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* Left sidebar - Filters */}
-        <div className="lg:col-span-3 space-y-4">
+        <div className="lg:col-span-3 space-y-4 lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto">
           <DateRangeFilter
             minDate={minDate}
             maxDate={maxDate}
@@ -150,7 +143,7 @@ const Index = () => {
         </div>
 
         {/* Main content */}
-        <div className="lg:col-span-6 space-y-6">
+        <div className="lg:col-span-6 space-y-4">
           <ControlPanel
             mode={mode}
             onModeChange={(newMode) => {
@@ -196,7 +189,7 @@ const Index = () => {
         </div>
 
         {/* Right sidebar - Analysis */}
-        <div className="lg:col-span-3">
+        <div className="lg:col-span-3 lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto">
           <AnalysisPanel
             mode={mode}
             concentricResult={concentricResult}
