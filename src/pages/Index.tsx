@@ -76,8 +76,8 @@ const Index = () => {
       filteredData,
       center1[0],
       center1[1],
-      innerRadius / 1000,
-      outerRadius / 1000
+      innerRadius,
+      outerRadius
     );
   }, [mode, filteredData, center1, innerRadius, outerRadius]);
 
@@ -89,7 +89,7 @@ const Index = () => {
       center1[1],
       center2[0],
       center2[1],
-      comparisonRadius / 1000
+      comparisonRadius
     );
   }, [mode, filteredData, center1, center2, comparisonRadius]);
 
