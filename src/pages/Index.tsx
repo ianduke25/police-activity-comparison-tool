@@ -5,7 +5,7 @@ import { OffenseFilter } from "@/components/OffenseFilter";
 import { AnalysisPanel } from "@/components/AnalysisPanel";
 import { ControlPanel } from "@/components/ControlPanel";
 import { DateRangeFilter } from "@/components/DateRangeFilter";
-import { CrimeData, analyzeConcentricCircles, compareTwoAreas } from "@/lib/crimeAnalysis";
+import { CrimeData, compareTwoAreas } from "@/lib/crimeAnalysis";
 import { motion } from "framer-motion";
 
 
@@ -14,12 +14,9 @@ const Index = () => {
   const [offenseTypes, setOffenseTypes] = useState<string[]>([]);
   const [selectedOffenses, setSelectedOffenses] = useState<string[]>([]);
   
-  const [mode, setMode] = useState<"concentric" | "comparison">("concentric");
   const [center1, setCenter1] = useState<[number, number] | null>(null);
   const [center2, setCenter2] = useState<[number, number] | null>(null);
   
-  const [innerRadius, setInnerRadius] = useState(500);
-  const [outerRadius, setOuterRadius] = useState(1500);
   const [comparisonRadius, setComparisonRadius] = useState(800);
   
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -77,19 +74,8 @@ const Index = () => {
     });
   }, [data, selectedOffenses, startDate, endDate]);
 
-  const concentricResult = useMemo(() => {
-    if (mode !== "concentric" || !center1) return null;
-    return analyzeConcentricCircles(
-      filteredData,
-      center1[0],
-      center1[1],
-      innerRadius,
-      outerRadius
-    );
-  }, [mode, filteredData, center1, innerRadius, outerRadius]);
-
   const comparisonResult = useMemo(() => {
-    if (mode !== "comparison" || !center1 || !center2) return null;
+    if (!center1 || !center2) return null;
     return compareTwoAreas(
       filteredData,
       center1[0],
@@ -98,13 +84,11 @@ const Index = () => {
       center2[1],
       comparisonRadius
     );
-  }, [mode, filteredData, center1, center2, comparisonRadius]);
+  }, [filteredData, center1, center2, comparisonRadius]);
 
   const handleReset = () => {
     setCenter1(null);
     setCenter2(null);
-    setInnerRadius(500);
-    setOuterRadius(1500);
     setComparisonRadius(800);
   };
 
@@ -126,18 +110,7 @@ const Index = () => {
 
       {/* Control Panel - Full width at top */}
       <ControlPanel
-        mode={mode}
-        onModeChange={(newMode) => {
-          setMode(newMode);
-          if (newMode === "concentric") {
-            setCenter2(null);
-          }
-        }}
-        innerRadius={innerRadius}
-        outerRadius={outerRadius}
         comparisonRadius={comparisonRadius}
-        onInnerRadiusChange={setInnerRadius}
-        onOuterRadiusChange={setOuterRadius}
         onComparisonRadiusChange={setComparisonRadius}
         onReset={handleReset}
         onCoordinateSet={(lat, lon, forArea2) => {
@@ -178,11 +151,8 @@ const Index = () => {
           >
             <CrimeMap
               data={filteredData}
-              mode={mode}
               center1={center1}
               center2={center2}
-              innerRadius={innerRadius}
-              outerRadius={outerRadius}
               comparisonRadius={comparisonRadius}
               onCenter1Change={setCenter1}
               onCenter2Change={setCenter2}
@@ -193,13 +163,9 @@ const Index = () => {
         {/* Right sidebar - Analysis */}
         <div className="lg:col-span-3">
           <AnalysisPanel
-            mode={mode}
-            concentricResult={concentricResult}
             comparisonResult={comparisonResult}
             center1={center1}
             center2={center2}
-            innerRadius={innerRadius}
-            outerRadius={outerRadius}
             comparisonRadius={comparisonRadius}
           />
         </div>
