@@ -39,10 +39,12 @@ const Index = () => {
       setOffenseTypes(types.sort());
       setSelectedOffenses(types);
       
-      // Set default center to data centroid
+      // Set default centers - Area 1 at data centroid, Area 2 offset to the east
       const avgLat = data.reduce((sum, d) => sum + d.lat, 0) / data.length;
       const avgLon = data.reduce((sum, d) => sum + d.lon, 0) / data.length;
       setCenter1([avgLat, avgLon]);
+      // Offset Area 2 by ~0.015 degrees (~1.5km) to the east
+      setCenter2([avgLat, avgLon + 0.015]);
     }
   }, [data]);
 
