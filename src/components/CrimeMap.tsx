@@ -14,11 +14,8 @@ L.Icon.Default.mergeOptions({
 
 interface CrimeMapProps {
   data: CrimeData[];
-  mode: "concentric" | "comparison";
   center1: [number, number] | null;
   center2: [number, number] | null;
-  innerRadius: number; // meters
-  outerRadius: number; // meters
   comparisonRadius: number; // meters
   onCenter1Change: (center: [number, number]) => void;
   onCenter2Change: (center: [number, number]) => void;
@@ -26,11 +23,8 @@ interface CrimeMapProps {
 
 export function CrimeMap({
   data,
-  mode,
   center1,
   center2,
-  innerRadius,
-  outerRadius,
   comparisonRadius,
   onCenter1Change,
   onCenter2Change,
@@ -38,24 +32,20 @@ export function CrimeMap({
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<LeafletMap | null>(null);
   const heatLayerRef = useRef<L.HeatLayer | null>(null as any);
-  const innerCircleRef = useRef<LeafletCircle | null>(null);
-  const outerCircleRef = useRef<LeafletCircle | null>(null);
   const compCircle1Ref = useRef<LeafletCircle | null>(null);
   const compCircle2Ref = useRef<LeafletCircle | null>(null);
   const marker1Ref = useRef<LeafletMarker | null>(null);
   const marker2Ref = useRef<LeafletMarker | null>(null);
 
-  // Use refs to track current mode and centers for click handler
-  const modeRef = useRef(mode);
+  // Use refs to track centers for click handler
   const center1Ref = useRef(center1);
   const center2Ref = useRef(center2);
 
   // Update refs when props change
   useEffect(() => {
-    modeRef.current = mode;
     center1Ref.current = center1;
     center2Ref.current = center2;
-  }, [mode, center1, center2]);
+  }, [center1, center2]);
 
   // Initialize map once
   useEffect(() => {
@@ -80,19 +70,14 @@ export function CrimeMap({
     // Click handler to place centroids - uses refs to get latest values
     map.on("click", (e: L.LeafletMouseEvent) => {
       const { lat, lng } = e.latlng;
-      const currentMode = modeRef.current;
       const currentCenter1 = center1Ref.current;
       const currentCenter2 = center2Ref.current;
 
-      if (currentMode === "concentric") {
+      // Comparison mode - place Area 1 first, then Area 2
+      if (!currentCenter1) {
         onCenter1Change([lat, lng]);
-      } else {
-        // Comparison mode
-        if (!currentCenter1) {
-          onCenter1Change([lat, lng]);
-        } else if (!currentCenter2) {
-          onCenter2Change([lat, lng]);
-        }
+      } else if (!currentCenter2) {
+        onCenter2Change([lat, lng]);
       }
     });
 
@@ -182,63 +167,44 @@ export function CrimeMap({
     }
   };
 
-  // Update shapes and markers when mode/centers/radii change
+  // Update shapes and markers when centers/radius change
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
 
     // Clear all circles first
-    [innerCircleRef, outerCircleRef, compCircle1Ref, compCircle2Ref].forEach((ref) => {
+    [compCircle1Ref, compCircle2Ref].forEach((ref) => {
       if (ref.current) {
         map.removeLayer(ref.current);
         ref.current = null;
       }
     });
 
-    if (mode === "concentric" && center1) {
-      innerCircleRef.current = L.circle(center1, {
-        radius: innerRadius,
-        color: "#10b981",
+    // Draw comparison circles
+    if (center1) {
+      compCircle1Ref.current = L.circle(center1, {
+        radius: comparisonRadius,
+        color: "#06b6d4",
         weight: 2,
-        fillColor: "#10b981",
-        fillOpacity: 0.1,
-      }).addTo(map);
-
-      outerCircleRef.current = L.circle(center1, {
-        radius: outerRadius,
-        color: "#f59e0b",
-        weight: 2,
-        fillColor: "#f59e0b",
-        fillOpacity: 0.05,
+        fillColor: "#06b6d4",
+        fillOpacity: 0.15,
       }).addTo(map);
     }
-
-    if (mode === "comparison") {
-      if (center1) {
-        compCircle1Ref.current = L.circle(center1, {
-          radius: comparisonRadius,
-          color: "#06b6d4",
-          weight: 2,
-          fillColor: "#06b6d4",
-          fillOpacity: 0.15,
-        }).addTo(map);
-      }
-      if (center2) {
-        compCircle2Ref.current = L.circle(center2, {
-          radius: comparisonRadius,
-          color: "#a855f7",
-          weight: 2,
-          fillColor: "#a855f7",
-          fillOpacity: 0.15,
-        }).addTo(map);
-      }
+    if (center2) {
+      compCircle2Ref.current = L.circle(center2, {
+        radius: comparisonRadius,
+        color: "#a855f7",
+        weight: 2,
+        fillColor: "#a855f7",
+        fillOpacity: 0.15,
+      }).addTo(map);
     }
 
     // Markers
     ensureMarker(center1, marker1Ref, "#10b981", onCenter1Change);
     ensureMarker(center2, marker2Ref, "#a855f7", onCenter2Change);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode, center1, center2, innerRadius, outerRadius, comparisonRadius]);
+  }, [center1, center2, comparisonRadius]);
 
   return (
     <div className="relative w-full h-full rounded-xl overflow-hidden border border-border shadow-lg">
